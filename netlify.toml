@@ -1,0 +1,19 @@
+
+[build]
+  publish = "public"
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+[[plugins]]
+  package = "@netlify/plugin-lighthouse"
+
+# Enable form handling on Netlify (no extra config needed for basic forms),
+# but we will also set up an incoming webhook via a function.
+
+# Redirect for a nice thank-you page
+[[redirects]]
+  from = "/success"
+  to = "/success.html"
+  status = 200

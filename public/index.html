@@ -1,0 +1,200 @@
+
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Nutzungsrechte – EGE Reklam</title>
+  <link rel="stylesheet" href="/style.css">
+  <meta name="robots" content="noindex">
+</head>
+<body>
+  <header class="head">
+    <img src="/logo.png" alt="EGE Reklam" class="logo">
+    <div class="title">
+      <h1>Nutzungsrechte – Formular</h1>
+      <p>EGE Reklam – Werbetechnik &amp; Druckerzeugnisse</p>
+    </div>
+  </header>
+
+  <main>
+    <form name="nutzungsrechte" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" action="/success.html">
+      <input type="hidden" name="form-name" value="nutzungsrechte">
+      <p class="hidden">
+        <label>Wenn Sie ein Mensch sind, lassen Sie dieses Feld leer:
+          <input name="bot-field">
+        </label>
+      </p>
+
+      <fieldset>
+        <legend>Kundendaten</legend>
+        <label>Firma
+          <input type="text" name="firma" autocomplete="organization">
+        </label>
+        <div class="grid">
+          <label>Vorname
+            <input type="text" name="vorname" required autocomplete="given-name">
+          </label>
+          <label>Nachname
+            <input type="text" name="nachname" required autocomplete="family-name">
+          </label>
+        </div>
+        <label>Adresse
+          <input type="text" name="adresse" required autocomplete="street-address">
+        </label>
+        <div class="grid">
+          <label>E-Mail
+            <input type="email" name="email" required autocomplete="email">
+          </label>
+          <label>Telefon
+            <input type="tel" name="telefon" autocomplete="tel">
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Nutzungsrechte</legend>
+        <label class="radio">
+          <input type="radio" name="rechte" value="Keine exklusiven Nutzungsrechte" required>
+          Keine Übertragung von exklusiven Nutzungsrechten (Nutzung nur im vereinbarten Rahmen).
+        </label>
+        <label class="radio">
+          <input type="radio" name="rechte" value="Exklusive Nutzungsrechte gewünscht">
+          Übertragung der exklusiven Nutzungsrechte gewünscht (Details separat vertraglich).
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Nutzung zu Referenzzwecken</legend>
+        <label class="radio">
+          <input type="radio" name="referenz" value="Einverstanden" required>
+          Ich bin mit der Nutzung zu Referenzzwecken einverstanden.
+        </label>
+        <label class="radio">
+          <input type="radio" name="referenz" value="Widersprochen" required>
+          Ich widerspreche der Nutzung zu Referenzzwecken.
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend>AGB</legend>
+        <label class="checkbox">
+          <input type="checkbox" name="agb" value="akzeptiert" required>
+          Ich habe die AGB gelesen und akzeptiert.
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Digitale Unterschrift</legend>
+        <p>Bitte unterschreiben Sie mit Maus oder Finger (Mobilgerät):</p>
+        <div class="sig-wrap">
+          <canvas id="sig" width="640" height="180"></canvas>
+          <div class="sig-actions">
+            <button type="button" id="clear">Zurücksetzen</button>
+          </div>
+        </div>
+        <input type="hidden" id="signatureData" name="signatureData">
+      </fieldset>
+
+      <p class="consent">
+        Mit Absenden bestätige ich die Richtigkeit der Angaben. Datum/Uhrzeit und IP-Adresse
+        werden zum Nachweis gespeichert.
+      </p>
+
+      <div class="actions">
+        <button type="submit">Verbindlich absenden</button>
+      </div>
+    </form>
+  </main>
+
+  <script>
+    // Simple signature pad (no external libs)
+    (function() {
+      const canvas = document.getElementById('sig');
+      const ctx = canvas.getContext('2d');
+      let drawing = false;
+      let last = null;
+
+      function resizeForHDPI() {
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        const w = canvas.width;
+        const h = canvas.height;
+        canvas.width = w * ratio;
+        canvas.height = h * ratio;
+        canvas.style.width = w + "px";
+        canvas.style.height = h + "px";
+        ctx.scale(ratio, ratio);
+        ctx.lineWidth = 2;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.strokeStyle = "#111";
+        clearCanvas();
+      }
+
+      function clearCanvas() {
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#000";
+      }
+
+      function pos(e) {
+        if (e.touches && e.touches.length) {
+          const rect = canvas.getBoundingClientRect();
+          return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
+        }
+        const rect = canvas.getBoundingClientRect();
+        return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+      }
+
+      function start(e) {
+        e.preventDefault();
+        drawing = true;
+        last = pos(e);
+      }
+      function move(e) {
+        if (!drawing) return;
+        const p = pos(e);
+        ctx.beginPath();
+        ctx.moveTo(last.x, last.y);
+        ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+        last = p;
+      }
+      function end(e) { drawing = false; }
+
+      canvas.addEventListener('mousedown', start);
+      canvas.addEventListener('mousemove', move);
+      canvas.addEventListener('mouseup', end);
+      canvas.addEventListener('mouseleave', end);
+
+      canvas.addEventListener('touchstart', start, {passive:false});
+      canvas.addEventListener('touchmove', move, {passive:false});
+      canvas.addEventListener('touchend', end);
+
+      document.getElementById('clear').addEventListener('click', function() {
+        clearCanvas();
+      });
+
+      // On submit, copy signature image to hidden input
+      const form = document.querySelector('form');
+      form.addEventListener('submit', function(e) {
+        // ensure signature is not blank (simple check)
+        const blank = document.createElement('canvas');
+        blank.width = canvas.width;
+        blank.height = canvas.height;
+        const isBlank = canvas.toDataURL() === blank.toDataURL();
+        if (isBlank) {
+          if (!confirm("Sie haben noch nicht unterschrieben. Trotzdem absenden?")) {
+            e.preventDefault();
+            return false;
+          }
+        }
+        document.getElementById('signatureData').value = canvas.toDataURL('image/png');
+      });
+
+      resizeForHDPI();
+      window.addEventListener('resize', resizeForHDPI);
+    })();
+  </script>
+</body>
+</html>
